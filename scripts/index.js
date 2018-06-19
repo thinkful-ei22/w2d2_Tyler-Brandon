@@ -855,6 +855,8 @@ const store = {
   videos: []
 };
 
+
+
 // TASK: Add the Youtube Search API Base URL here:
 // Documentation is here: https://developers.google.com/youtube/v3/docs/search/list#usage
 const BASE_URL = 'https://www.googleapis.com/youtube/v3/search';
@@ -864,7 +866,7 @@ const BASE_URL = 'https://www.googleapis.com/youtube/v3/search';
 // 2. Use `searchTerm` to construct the right query object based on the Youtube API docs
 // 3. Make a getJSON call using the query object and sending the provided callback in as the last argument
 // TEST IT! Execute this function and console log the results inside the callback.
-const fetchVideos = function(searchTerm, callback) {
+const fetchVideos = function(searchTerm) {
 // console.log('`fetchVideos` ran');
   const query = {
     part: 'snippet',
@@ -873,23 +875,16 @@ const fetchVideos = function(searchTerm, callback) {
     maxResults: 25
   };
 
-  $.getJSON(BASE_URL, query, (response) => {
-    console.log(response);
-  });
-
-  const url = BASE_URL + searchTerm;
-
-  // let request = $.getJSON(url, function(response){
-  //   //console.log(response);
-  //   //console.log(JSON.stringify(response));
-  //   let str = JSON.stringify(response);
-  //   console.log(str);
-  //   // $('#search-container').html('<pre>' + str + '</pre>');
-  // });
-
-  // request.execute(function(response) {
+  $.getJSON(BASE_URL, query, function (response) {
     
-  // });
+    const vidData = response;
+    console.log(vidData);
+
+    const videos = decorateResponse(vidData); 
+    addVideosToStore(videos);
+    render();
+    
+  });  
 };
 
 //fetchVideos('world cup');
@@ -924,7 +919,7 @@ const generateVideoItemHtml = function(video) {
   return `
   <li data-id="${video.id}">
    <h3>${video.title}</h3> 
-   <img src="${video.thumbnail}"> </li>;
+   <img src="${video.thumbnail}"> </li>
    `;
 };
 
@@ -974,16 +969,13 @@ const handleFormSubmit = function() {
     //do some ajax stuff here?? 
     const queryTarget = $(event.currentTarget).find('#search-term');
     const query = queryTarget.val();
+    //console.log(query);
     queryTarget.val('');
-    function callback(response){ 
-      //console.log(fetchVideos.query.q);
-      fetchVideos(query);
-      const videos = decorateResponse(response); 
-      addVideosToStore(videos); 
-      render(); 
-    }
+    fetchVideos(query);
 
-  }); 
+    
+  });
+ 
 };
 
 // When DOM is ready:
